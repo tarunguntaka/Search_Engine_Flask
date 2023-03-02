@@ -1,0 +1,52 @@
+
+
+{% extends "layout.html" %}
+
+{% block s1 %}
+ <script>
+    function updateClickStatus(title, link) {
+        // Send an HTTP request to the Flask app to update the click status of the result
+        fetch('/update_click_status?title=' + title + '&link=' + link)
+            .then(response => response.json())
+            .then(data => {
+                // Get the div element with the specified ID
+                var div = document.getElementById(title);
+            });
+    }
+ </script>
+{% endblock s1 %}
+
+
+{% block content %}
+    <h1>Search Results for "{{query}}"</h1>
+    {% if not results.empty %}
+        {% for index, row in results.iterrows() %}
+            <div class="container">
+                <h5>{{ row['link'] }}</h5>
+                <h3><a href="{{ row['link'] }}" target="_blank" onclick="updateClickStatus('{{ row['title'] }}', '{{ row['link'] }}')">{{ row['title'] }}</a></h3>
+                    <div class="container">
+                        <span> {{row.description}} <span>
+                    </div>
+            </div>
+            <br>
+        {% endfor %}
+    {% else %}
+        <p>No results found for "{{query}}"</p>
+    {% endif %}
+{% endblock %}
+
+
+{% block pagination %}
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      <li class="page-item"><a class="page-link" href="{{ url_for('results', query=query, start=start-10) }}">Previous</a></li>
+      <li class="page-item"><a class="page-link" href="{{ url_for('results', query=query, start=0) }}">1</a></li>
+      <li class="page-item"><a class="page-link" href="{{ url_for('results', query=query, start=10) }}">2</a></li>
+      <li class="page-item"><a class="page-link" href="{{ url_for('results', query=query, start=20) }}">3</a></li>
+      <li class="page-item"><a class="page-link" href="{{ url_for('results', query=query, start=30) }}">4</a></li>
+      <li class="page-item"><a class="page-link" href="{{ url_for('results', query=query, start=40) }}">5</a></li>
+      <li class="page-item"><a class="page-link" href="{{ url_for('results', query=query, start=start+10) }}">Next</a></li>
+    </ul>
+  </nav>
+{% endblock %}
