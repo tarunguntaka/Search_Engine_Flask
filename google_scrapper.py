@@ -77,10 +77,10 @@ class GoogleSearch:
         return dfs.drop_duplicates()
 
 
-g = GoogleSearch()
+#g = GoogleSearch()
 
 #df = g.search_google(query="machine learning",start=20)
 #df.to_csv('first20.csv', index=False)
 
-df2 = g.search_multiple_pages(query="machine learning")
-df2.to_csv('ml.csv', index=False)
+# df2 = g.search_multiple_pages(query="machine learning")
+# df2.to_csv('ml.csv', index=False)
