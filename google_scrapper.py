@@ -14,25 +14,7 @@ class GoogleSearch:
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
         headers = {"user-agent": user_agent}
         response = requests.get(url, headers=headers)
-        
-        #content1 = BeautifulSoup(response.text, 'lxml')
-        #description = [descr.text for descr in content1.findAll('span', {'class': 'VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf'})]
-
-        # if response.status_code == 200:
-        #     soup = BeautifulSoup(response.content, "html.parser")
-        #     results = []
-        #     for g in soup.find_all('div', class_='yuRUbf'):
-        #         anchors = g.find_all('a')
-        #         if anchors:
-        #             link = anchors[0]['href']
-        #             title = g.find('h3').text
-        #             results.append({'title': title, 'link': link})
-            
-        #     for g in soup.find_all('div', class_='VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf'):
-        #         anchors = g.find_all('span')
-        #         if anchors:
-        #             description = g.find('span').text
-        #             print(description)
+    
         if response.status_code == 200:           
             soup = BeautifulSoup(response.content, "html.parser")
             results = []
@@ -48,16 +30,22 @@ class GoogleSearch:
                     else:
                         results.append({'title': title, 'link': link, 'Click_Status': def_click})
             for i, g in enumerate(soup.find_all('div', class_='VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf')):
-                anchors = g.find_all('span')
-                if anchors:
-                    description = g.find('span').text
+                span_elements = g.find_all('span')
+                if span_elements:
+                    description =' '.join([span.text for span in span_elements]) 
                     if i < len(results):
                         results[i]['description'] = description
                     else:
                         results.append({'description': description})
-        
+                else:
+                    description = ' '
+                    if i < len(results):
+                        results[i]['description'] = description
+                    else:
+                        results.append({'description': description})
 
             df = pd.DataFrame(results)
+            df['Click_Status']=False
             if start == 0:
                 self.results_df = df
             else:
@@ -77,10 +65,10 @@ class GoogleSearch:
         return dfs.drop_duplicates()
 
 
-#g = GoogleSearch()
+# g = GoogleSearch()
 
-#df = g.search_google(query="machine learning",start=20)
-#df.to_csv('first20.csv', index=False)
+# df = g.search_google(query="ai",start=20)
+# df.to_csv('first20.csv', index=False)
 
 # df2 = g.search_multiple_pages(query="machine learning")
 # df2.to_csv('ml.csv', index=False)

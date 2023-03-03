@@ -8,6 +8,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 import pandas as pd  
 from google_scrapper import GoogleSearch
+from ml import relevantlink
 import os
 #------------------------------------------------------------------------------
 app = Flask(__name__)
@@ -50,15 +51,25 @@ def results(query):
 def predict(query):
     
     # Check if search results file already exists
-    if os.path.exists(f'search_results_{query}.csv'):
-        df = pd.read_csv(f'search_results_{query}.csv')
-    else:
-        g = GoogleSearch()
-        df = g.search_multiple_pages(query=query)
-        df.to_csv(f'search_results_{query}.csv', index=False)
+    # if os.path.exists(f'search_results_{query}.csv'):
+    #     df = pd.read_csv(f'search_results_{query}.csv')
+    # else:
+    #     g = GoogleSearch()
+    #     df = g.search_multiple_pages(query=query)
+    #     df.to_csv(f'search_results_{query}.csv', index=False)
         
+    rl = relevantlink(f'search_results_{query}.csv')
+    result_df = rl._find_similar_links()
 
+    return render_template('results.html', query=query, results=result_df)
+
+
+@app.route('/predict_next/<query>', methods = ['GET','POST'])
+def predict_next(query):
+    
+    
     return render_template('results.html', query=query, results=df)
+
 
 #A route to update the click status of a search result
 @app.route('/update_click_status', methods=['GET'])
@@ -84,17 +95,6 @@ def update_click_status():
     # Write the updated dataframe back to the search results CSV file
     df.to_csv(f'search_results_{query}.csv', index=False)
     
-    
-
-    # Open the CSV file in append mode
-    # with open('clicked_results.csv', 'a') as csvfile:
-    #     # Create a writer object
-    #     csv_writer = csv.writer(csvfile)
-
-    #     # Write the title and link of the clicked search result to the CSV file
-    #     csv_writer.writerow([title, link, click_time])
-
-    # # Return a success message as a JSON response
     return jsonify({'message': 'Successfully recorded clicked result'})
 
 
